@@ -13,8 +13,8 @@ export class Yard {
     }
 
     checkAnimalCollision(animal: Animal): boolean {
-        const yardBounds = this.sprite.getBounds(); // PIXI.Rectangle
-        const animalBounds = animal.sprite.getBounds(); // PIXI.Rectangle
+        const yardBounds = this.sprite.getBounds(); 
+        const animalBounds = animal.sprite.getBounds(); 
 
         // Check if the animal's center is inside the yard bounds
         return yardBounds.containsPoint(

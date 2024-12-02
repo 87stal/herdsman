@@ -3,9 +3,9 @@ import * as PIXI from 'pixi.js';
 export class Animal {
     sprite: PIXI.Graphics;
     isFollowing: boolean = false;
-    patrolPoints: { x: number; y: number }[]; // Патрульні точки
-    currentPatrolIndex: number = 0; // Поточна точка патруля
-    speed: number = 1; // Швидкість руху
+    patrolPoints: { x: number; y: number }[]; // Patrol points
+    currentPatrolIndex: number = 0; // Current point of patrol
+    speed: number = 1; // Speed of moving
 
     constructor(stage: PIXI.Container, x: number, y: number) {
         this.sprite = new PIXI.Graphics();
@@ -14,10 +14,12 @@ export class Animal {
         this.sprite.position.set(x, y);
         stage.addChild(this.sprite);
 
+        const patrolRange = 100; // Range of patrol points around the spawn position
+        const patrolOffset = 50; // Offset to allow negative patrol values within range
         // Randomly generate patrol points
         this.patrolPoints = [
-            { x: x + Math.random() * 100 - 50, y: y + Math.random() * 100 - 50 },
-            { x: x + Math.random() * 100 - 50, y: y + Math.random() * 100 - 50 },
+            { x: x + Math.random() * 100 - 50, y: y + Math.random() * patrolRange - patrolOffset },
+            { x: x + Math.random() * 100 - 50, y: y + Math.random() * patrolRange - patrolOffset },
         ];
     }
 

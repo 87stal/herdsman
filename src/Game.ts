@@ -17,21 +17,26 @@ export class Game {
 
 
         const stage = this.app.stage;
+        const minAnimals = 5; // Minimum number of animals
+        const maxAnimals = 15; // Maximum number of animals
         this.yard = new Yard(stage);
         this.mainHero = new MainHero(stage);
+        
         // Spawn initial animals
         // Generate a random number of animals (e.g., between 5 and 15)
-        const numAnimals = Math.floor(Math.random() * 11) + 5; // Random number between 5 and 15
+        const numAnimals = Math.floor(Math.random() * (maxAnimals - minAnimals + 1)) + minAnimals; // Random number between 5 and 15
         for (let i = 0; i < numAnimals; i++) {
             this.spawnAnimal(); // Spawn each animal at a random position
         }
 
         // Add the score display
-        this.scoreText = new PIXI.Text(`Score: ${this.score}`, {
+        this.scoreText = new PIXI.Text({
+            text: `Score: ${this.score}`,
             fontSize: 24,
             fill: 0xffffff,
             fontFamily: 'Arial',
-        });
+        } as PIXI.TextOptions);
+        
         this.scoreText.position.set(10, 10); // Top-left corner
         stage.addChild(this.scoreText);
 
@@ -53,11 +58,13 @@ export class Game {
 
     private spawnAnimal(): void {
         let x: number, y: number;
+        const spawnMargin = 50; // Margin from the screen edges for animal spawn
+        const spawnPadding = 25; // Additional padding to keep animals away from the exact edges
 
         // Generate random positions until the animal is outside the yard
         do {
-            x = Math.random() * (this.app.screen.width - 50) + 25;
-            y = Math.random() * (this.app.screen.height - 50) + 25;
+            x = Math.random() * (this.app.screen.width - spawnMargin) + spawnPadding;
+            y = Math.random() * (this.app.screen.height - spawnMargin) + spawnPadding;
         } while (this.isInYard(x, y)); // Ensure the animal is not in the yard
 
         const newAnimal = new Animal(this.app.stage, x, y);
@@ -76,11 +83,13 @@ export class Game {
         const yardBounds = this.yard.sprite.getBounds(); // Get the yard bounds
         // Check for collisions
         this.animals.forEach((animal, index) => {
-                const dx = animal.sprite.x - this.mainHero.sprite.x;
-                const dy = animal.sprite.y - this.mainHero.sprite.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+            const dx = animal.sprite.x - this.mainHero.sprite.x;
+            const dy = animal.sprite.y - this.mainHero.sprite.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const followDistance = 30; // Maximum distance for an animal to start following
+            const maxGroupSize = 5;   // Maximum number of animals in the group
 
-                if (!animal.isFollowing && distance < 30 && this.group.length < 5) {
+                if (!animal.isFollowing && distance < followDistance && this.group.length < maxGroupSize) {
                     animal.isFollowing = true; // Animal starts following
                     this.group.push(animal); // Add to group
                 }
@@ -109,7 +118,10 @@ export class Game {
 
     private startAnimalSpawner(): void {
         const maxAnimals = 20; // Maximum number of animals allowed
-        const spawnInterval = () => Math.random() * 3000 + 2000;
+        const minSpawnInterval = 2000; // Minimum time between spawns (ms)
+        const maxAdditionalInterval = 3000; // Random additional time added to the spawn interval
+
+        const spawnInterval = () => Math.random() * maxAdditionalInterval + minSpawnInterval;
 
         const spawner = () => {
             if (this.animals.length < maxAnimals) {
